@@ -10,13 +10,18 @@
   <h1>Melon Front!</h1>
   <a href="artist-list.html">Artist-list</a>
 
+  <form action="" method="post" id="login">
+    <input type="text" id='username' placeholder="ID">
+    <input type="password" id="password" placeholder="Password">
+    <button type="submit">로그인</button>
+  </form>
+
   <script src="js/axios.js"></script>
   <script src="js/jquery-3.3.1.min.js"></script>
   <script src="js/cookie.js"></script>
   <script>
 
   // AuthToken 받아오는 js 함수 구현
-  getAuthToken('kahee','rkgml12345')
   function getAuthToken (username, password){
     axios({
       url : "http://localhost:8000/api/members/auth-token/",
@@ -29,13 +34,25 @@
       // 토큰 만료일 7일로 설정
       var token = response.data.token;
       setCookie('token',token,7);
-
-      console.log(response);
+      console.log(response.data.token);
     }).catch(function(error){
       console.log(error);
       console.log(error.response);
     });
   }
+
+  $('form#login').submit(function (event){
+    var username = $('#username').val();
+    var password = $('#password').val();
+
+    getAuthToken(username,password)
+    $('#username').val('');
+    $('#password').val('');
+
+
+    // form의 기본이벤트를 실행시키지 않음
+    event.preventDefault();
+  })
 
 
   </script>
