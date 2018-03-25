@@ -4,27 +4,41 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Melon Front</title>
-  <link rel="stylesheet" href="/css/index.css">
+  <title>Document</title>
 </head>
 <body>
-
-  <ul class="artist-list">
-
-  </ul>
-
-  <div id="template">
-    <li id="artist-item-template" class="artist-item">
-      <span class="artist-name"></span>
-      <img src="" alt="" class="artist-img-profile">
-    </li>
-  </div>
-  <button id="btnMoreArtists">더보기</button>
+  <h1>Melon Front!</h1>
+  <a href="artist-list.html">Artist-list</a>
 
   <script src="js/axios.js"></script>
   <script src="js/jquery-3.3.1.min.js"></script>
-  <script src="js/artist-list.js">  </script>
+  <script src="js/cookie.js"></script>
+  <script>
 
+  // AuthToken 받아오는 js 함수 구현
+  getAuthToken('kahee','rkgml12345')
+  function getAuthToken (username, password){
+    axios({
+      url : "http://localhost:8000/api/members/auth-token/",
+      method: 'post',
+      data:{
+        username:username,
+        password : password,
+      }
+    }).then(function(response) {
+      // 토큰 만료일 7일로 설정
+      var token = response.data.token;
+      setCookie('token',token,7);
+
+      console.log(response);
+    }).catch(function(error){
+      console.log(error);
+      console.log(error.response);
+    });
+  }
+
+
+  </script>
 
 </body>
 </html>
