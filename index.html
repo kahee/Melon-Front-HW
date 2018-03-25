@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Document</title>
+  <link rel="stylesheet" href="css/base.css">
 </head>
 <body>
   <h1>Melon Front!</h1>
@@ -16,9 +17,48 @@
     <button type="submit">로그인</button>
   </form>
 
+  <p id = "loginCheck" class="none"></p>
+
   <script src="js/axios.js"></script>
   <script src="js/jquery-3.3.1.min.js"></script>
   <script src="js/cookie.js"></script>
+  <script>
+  // 1.클라이언트에 'token'이라는 Cookie가 있는지 확인
+  // 2. 만약 있다면 해당 값을 가져온 후,
+  // 3. getUserInfo()를 실행
+  // ->  UserDetail에 Get요청, pk 없음
+  //  url api/members/info/
+  // request.user 를 기준으로 serialize한 User정보를 리턴
+  // 4. 유저정보를 가져온 후 , getAuthToken .then()아래 유저정보 표시 로직을 실행
+  function initUserInfo(){
+    var token = getCookie('token')
+    console.log(token)
+    if (token){
+      axios({
+        url: "http://localhost:8000/api/members/info/",
+        method:"get",
+        headers:{
+          Authorization : 'Token' + ' ' + token
+        }
+      }).then(function(response){
+        setUserInfo(response.data);
+      }).catch(function(error){
+        console.log(error.response);
+      });
+    }
+  }
+  initUserInfo();
+
+  function setUserInfo (user){
+    // 유저정보를 표시할 요소에 텍스트를 채움
+    $('#loginCheck').text(user.username + "님으로 로그인 중입니다.");
+    // 이후 해당 요소의 'none' 클래스 속성을 삭제
+    $('#loginCheck').removeClass('none');
+    // form 에 'none' 클래스 속성 추가
+    $('form#login').addClass('none');
+  }
+  </script>
+
   <script>
 
   // AuthToken 받아오는 js 함수 구현
@@ -34,7 +74,15 @@
       // 토큰 만료일 7일로 설정
       var token = response.data.token;
       setCookie('token',token,7);
-      console.log(response.data.token);
+
+      var user = response.data.user;
+      // 유저정보를 표시할 요소에 텍스트를 채움
+      $('#loginCheck').text(user.username + "님으로 로그인 중입니다.");
+      // 이후 해당 요소의 'none' 클래스 속성을 삭제
+      $('#loginCheck').removeClass('none');
+      // form 에 'none' 클래스 속성 추가
+      $('form#login').addClass('none');
+
     }).catch(function(error){
       console.log(error);
       console.log(error.response);
@@ -42,17 +90,24 @@
   }
 
   $('form#login').submit(function (event){
+    // form내부의 input 요소들의 값 가져오기
     var username = $('#username').val();
     var password = $('#password').val();
 
+    // Token 을 가져오는 함수 실행
     getAuthToken(username,password)
+
+    // form 내부의 input요소를 비워줌
     $('#username').val('');
     $('#password').val('');
 
-
-    // form의 기본이벤트를 실행시키지 않음
+    // form의 기본이벤트(post요청)를 실행시키지 않음
     event.preventDefault();
+    // getCookie('token')
   })
+
+
+
 
 
   </script>
