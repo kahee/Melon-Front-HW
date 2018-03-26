@@ -16,7 +16,7 @@
     <input type="password" id="password" placeholder="Password">
     <button type="submit">로그인</button>
   </form>
-
+  <button id="btn-facebook"> 페이스북 로그인 </button>
   <p id = "loginCheck" class="none"></p>
 
   <script src="js/axios.js"></script>
@@ -26,8 +26,47 @@
   <script src="js/fb.js"></script>
   <script src="js/init-user-info.js"></script>
   <script>
-    initUserInfo();
-  </script>
+  initUserInfo();
+  // 사용자가 Facebook 로그인을 사용하여 이미 앱에 로그인했는지 확인합니다. FB.getLoginStatus를 호출하여 이 프로세스를 시작합니다. 이 함수는 Facebook 호출을 요청하여 로그인 상태를 가져오고 결과를 통해 콜백 함수를 호출
+  $('#btn-facebook').click(function(){
+    facebookLogin();
+  });
+
+  function facebookLogin(){
+    // 이 브라우저가 페이스북 로그인이 되어있는지 검사
+    FB.getLoginStatus(function (response) {
+      // 만약 로그인 되어있지 않다면
+      if (response.status != 'connected') {
+        // 로그인 대화상자를 사용해 로그인 유도
+        FB.login(function (response) {
+          // 로그인이 완료되면 accessToken을 가져와서
+          var accessToken = response.authResponse.accessToken;
+          console.log(accessToken)
+        });
+      } else {
+        accessToken = response.authResponse.accessToken;
+      }
+      // DRF에 Facebook access_token을 사용한 AuthToken요청
+      axios({
+        url:'http://localhost:8000/api/members/facebook-auth-token/',
+        method:'post',
+        data : {
+          access_token : accessToken
+        }
+      }).then(function (response){
+        // 요청에 성공하면 setCookie 및 setUserInfo 실행
+        console.log(response)
+        var token = response.data.token;
+        var user = response.data.user;
+        setCookie('token',token,7);
+        setUserInfo(user);
+      }).catch(function (error){
+        console.log(error);
+        console.log(error.response);
+      });
+    });
+  }
+</script>
 
 
 
