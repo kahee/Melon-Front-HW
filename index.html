@@ -16,6 +16,7 @@
     <input type="password" id="password" placeholder="Password">
     <button type="submit">로그인</button>
   </form>
+  <button id="btn-logout">로그아웃</button>
   <button id="btn-facebook"> 페이스북 로그인 </button>
   <p id = "loginCheck" class="none"></p>
 
@@ -31,6 +32,13 @@
   $('#btn-facebook').click(function(){
     facebookLogin();
   });
+  $('#btn-logout').click(function(){
+    eraseCookie('token');
+    $('#loginCheck').addClass('none');
+    $('form#login').removeClass('none');
+  });
+
+
 
   function facebookLogin(){
     // 이 브라우저가 페이스북 로그인이 되어있는지 검사
